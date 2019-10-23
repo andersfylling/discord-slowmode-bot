@@ -7,13 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/jfoster/discord-slowmode-bot/internal/log"
+
 	"github.com/andersfylling/disgord"
-	"github.com/andersfylling/disgord/event"
 	"github.com/andersfylling/disgord/std"
 	"github.com/smallfish/simpleyaml"
 	"github.com/urfave/cli"
-
-	"github.com/jfoster/discord-slowmode-bot/internal/log"
 )
 
 const (
@@ -110,7 +109,7 @@ func getCfg() (*simpleyaml.Yaml, error) {
 func runBot(token string) error {
 	logr.Info("Creating Discord session")
 
-	config := &disgord.Config{
+	config := disgord.Config{
 		BotToken: token,
 	}
 	if logr.Debug {
@@ -124,13 +123,13 @@ func runBot(token string) error {
 
 	bot.AddPermission(disgord.PermissionManageChannels)
 
-	bot.On(event.Ready, onReady)
+	bot.On(disgord.EvtReady, onReady)
 
 	filter, err := std.NewMsgFilter(bot)
 	if err != nil {
 		return err
 	}
-	bot.On(event.MessageCreate, filter.HasBotMentionPrefix, onMessageCreate)
+	bot.On(disgord.EvtMessageCreate, filter.HasBotMentionPrefix, onMessageCreate)
 
 	logr.Info("Connecting")
 	start := time.Now()
